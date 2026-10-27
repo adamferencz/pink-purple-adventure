@@ -2,6 +2,8 @@
 
 Kompletní hratelná 2D plošinovka běžící přímo ve webovém prohlížeči (PC i mobil) bez nutnosti instalace nebo externích závislostí.
 
+🎮 **Hrajte online zde:** [https://adamferencz.github.io/pink-purple-adventure/](https://adamferencz.github.io/pink-purple-adventure/)
+
 ---
 
 ## 🚀 Jak spustit hru
