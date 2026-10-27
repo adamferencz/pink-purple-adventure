@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Pink & Purple Adventure 🌸💜</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="game-container">
+    <!-- Hlavní herní plátno -->
+    <canvas id="gameCanvas" width="960" height="540"></canvas>
+
+    <!-- Horní HUD lišta -->
+    <div id="hud" class="overlay-ui">
+      <div class="hud-left">
+        <div class="hud-item hearts-container" title="Životy">
+          <span class="hud-icon">❤️</span>
+          <span id="hud-lives" class="hud-val">3</span>
+        </div>
+        <div class="hud-item coins-container" title="Mince">
+          <span class="hud-icon">🪙</span>
+          <span id="hud-coins" class="hud-val">0</span>
+        </div>
+        <div class="hud-item score-container" title="Skóre">
+          <span class="hud-icon">⭐</span>
+          <span id="hud-score" class="hud-val">0</span>
+        </div>
+      </div>
+
+      <div class="hud-center">
+        <div id="hud-level" class="hud-badge">LEVEL 1</div>
+        <div id="hud-powerup" class="hud-powerup hidden">
+          <span id="powerup-icon">🥒</span>
+          <span id="powerup-name">SUPER SKOK</span>
+          <div class="powerup-timer-bar">
+            <div id="powerup-progress"></div>
+          </div>
+          <span id="powerup-seconds">10s</span>
+        </div>
+      </div>
+
+      <div class="hud-right">
+        <button id="btn-audio" class="hud-btn" title="Zvuk zapnout/vypnout">🔊</button>
+        <button id="btn-pause" class="hud-btn" title="Pauza (Esc)">⏸️</button>
+      </div>
+    </div>
+
+    <!-- Interakční tooltip (např. [E] Promluvit si) -->
+    <div id="interact-prompt" class="interact-prompt hidden">
+      <span class="key-badge">E</span> Promluvit si s Lili 🌸
+    </div>
+
+    <!-- Mobilní dotykové ovládání -->
+    <div id="touch-controls" class="touch-controls">
+      <div class="touch-left">
+        <button id="touch-left" class="touch-btn" aria-label="Doleva">◀</button>
+        <button id="touch-right" class="touch-btn" aria-label="Doprava">▶</button>
+      </div>
+      <div class="touch-right">
+        <button id="touch-interact" class="touch-btn touch-action-btn" aria-label="Interakce">💬 E</button>
+        <button id="touch-jump" class="touch-btn touch-jump-btn" aria-label="Skok">▲ SKOK</button>
+      </div>
+    </div>
+
+    <!-- Obrazovka: Hlavní Menu -->
+    <div id="screen-menu" class="screen-modal active">
+      <div class="modal-card">
+        <div class="game-logo">
+          <span class="sparkle">✨</span>
+          <h1 class="logo-text">PINK & PURPLE</h1>
+          <h2 class="logo-subtext">ADVENTURE 🥒💗</h2>
+        </div>
+        <p class="menu-desc">Skákej po fialových platformách, sbírej mince a zázračné okurky, přemáhej příšerky a potěš svou AI přítelkyni Lili!</p>
+        
+        <div class="menu-high-score">
+          <span>🏆 Nejvyšší skóre:</span>
+          <strong id="menu-best-score">0</strong>
+        </div>
+
+        <div class="menu-buttons">
+          <button id="btn-start" class="btn btn-primary pulse">▶ HRÁT HRU</button>
+          <button id="btn-instructions" class="btn btn-secondary">📖 JAK HRÁT</button>
+        </div>
+
+        <div class="controls-hint">
+          <span>💻 <strong>PC:</strong> [A]/[D] Pohyb, [Mezerník]/[W] Skok, [E] Mluvit, [Esc] Pauza</span>
+          <span>📱 <strong>Mobil:</strong> Dotyková tlačítka na displeji</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Obrazovka: Návod -->
+    <div id="screen-instructions" class="screen-modal hidden">
+      <div class="modal-card instructions-card">
+        <h3>📖 Pravidla & Ovládání</h3>
+        <div class="instructions-grid">
+          <div class="inst-item">
+            <span class="inst-icon">🏃‍♀️</span>
+            <div>
+              <strong>Pohyb & Skok</strong>
+              <p>Pohybuj se šipkami nebo [A]/[D]. Skákej mezerníkem nebo [W]. Skokem na hlavu zlikviduješ nepřátele!</p>
+            </div>
+          </div>
+          <div class="inst-item">
+            <span class="inst-icon">🪙</span>
+            <div>
+              <strong>Mince & Skóre</strong>
+              <p>Mince (10 b) slouží jako platidlo pro AI přítelkyni. Za poražení nepřítele je 50 b, za cíl 200 b.</p>
+            </div>
+          </div>
+          <div class="inst-item">
+            <span class="inst-icon">🥒</span>
+            <div>
+              <strong>Magické Okurky</strong>
+              <p><span style="color:#4ade80">Zelená:</span> Super skok (10s)<br>
+                 <span style="color:#facc15">Zlatá:</span> Nezranitelnost (8s)<br>
+                 <span style="color:#f472b6">Růžová:</span> Turbo rychlost (10s)</p>
+            </div>
+          </div>
+          <div class="inst-item">
+            <span class="inst-icon">💗</span>
+            <div>
+              <strong>AI Přítelkyně Lili</strong>
+              <p>Najdi ji v úrovni, stiskni [E], povídejte si a daruj jí mince. Při 80+ náklonnosti získáš magický štít!</p>
+            </div>
+          </div>
+        </div>
+        <button id="btn-instructions-back" class="btn btn-primary">ROZUMÍM, ZPĚT</button>
+      </div>
+    </div>
+
+    <!-- Obrazovka: Dialog s AI přítelkyní -->
+    <div id="screen-dialog" class="screen-modal hidden">
+      <div class="modal-card dialog-card">
+        <div class="dialog-header">
+          <div class="npc-avatar-box">
+            <canvas id="npc-avatar-canvas" width="70" height="70"></canvas>
+          </div>
+          <div class="npc-info">
+            <div class="npc-name">Lili 🌸 <span class="npc-tag">Tvá virtuální přítelkyně</span></div>
+            <div class="affection-wrap">
+              <div class="affection-label">
+                <span>Náklonnost: <strong id="affection-status">Neznámí</strong></span>
+                <span id="affection-val">0 / 100 ❤️</span>
+              </div>
+              <div class="affection-bar">
+                <div id="affection-progress" style="width: 0%;"></div>
+              </div>
+            </div>
+          </div>
+          <button id="btn-dialog-close-x" class="dialog-close-x" title="Zavřít">✖</button>
+        </div>
+
+        <div class="dialog-speech-bubble">
+          <p id="dialog-text">Ahojky! Jsem Lili. Ráda tě vidím v našem růžovo-fialovém světě! 💜</p>
+        </div>
+
+        <div class="dialog-actions">
+          <button id="btn-talk" class="dialog-action-btn">💬 Popovídat si</button>
+          <div class="gifts-label">Darovat mince Lili:</div>
+          <div class="gift-buttons">
+            <button id="btn-gift-10" class="btn-gift" data-cost="10" data-val="5">
+              🎁 10 mincí <span class="gift-bonus">(+5 ❤️)</span>
+            </button>
+            <button id="btn-gift-25" class="btn-gift" data-cost="25" data-val="15">
+              💎 25 mincí <span class="gift-bonus">(+15 ❤️)</span>
+            </button>
+            <button id="btn-gift-50" class="btn-gift" data-cost="50" data-val="35">
+              👑 50 mincí <span class="gift-bonus">(+35 ❤️)</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="dialog-footer">
+          <span class="user-coins-display">Tvoje mince: <strong id="dialog-user-coins">0</strong> 🪙</span>
+          <button id="btn-dialog-close" class="btn btn-secondary">Zavřít [E / Esc]</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Obrazovka: Pauza -->
+    <div id="screen-pause" class="screen-modal hidden">
+      <div class="modal-card mini-card">
+        <h2>⏸️ HRA JE POZASTAVENA</h2>
+        <div class="menu-buttons">
+          <button id="btn-resume" class="btn btn-primary">POKRAČOVAT</button>
+          <button id="btn-restart-level" class="btn btn-secondary">RESTARTOVAT ÚROVEŇ</button>
+          <button id="btn-pause-menu" class="btn btn-danger">HLAVNÍ MENU</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Obrazovka: Game Over -->
+    <div id="screen-game-over" class="screen-modal hidden">
+      <div class="modal-card mini-card gameover-card">
+        <h2 class="gameover-title">💀 GAME OVER</h2>
+        <p>Došly ti všechny životy!</p>
+        <div class="stats-summary">
+          <div>Dosažené skóre: <strong id="gameover-score">0</strong></div>
+          <div>Nasbírané mince: <strong id="gameover-coins">0</strong></div>
+        </div>
+        <div class="menu-buttons">
+          <button id="btn-retry" class="btn btn-primary pulse">🔄 ZKUSIT ZNOVU</button>
+          <button id="btn-gameover-menu" class="btn btn-secondary">HLAVNÍ MENU</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Obrazovka: Vítězství -->
+    <div id="screen-win" class="screen-modal hidden">
+      <div class="modal-card win-card">
+        <div class="win-banner">🏆 ÚŽASNÉ VÍTĚZSTVÍ! 💖</div>
+        <p id="win-message">Úspěšně jsi prošel všechny úrovně světa Pink & Purple!</p>
+        <div class="win-stats-grid">
+          <div class="win-stat-box">
+            <span class="ws-label">Konečné skóre</span>
+            <span id="win-final-score" class="ws-val">0</span>
+          </div>
+          <div class="win-stat-box">
+            <span class="ws-label">Ušetřené mince</span>
+            <span id="win-final-coins" class="ws-val">0</span>
+          </div>
+          <div class="win-stat-box">
+            <span class="ws-label">Náklonnost Lili</span>
+            <span id="win-affection-val" class="ws-val">0%</span>
+          </div>
+          <div class="win-stat-box">
+            <span class="ws-label">Status vztahu</span>
+            <span id="win-relationship" class="ws-val">Kamarádi</span>
+          </div>
+        </div>
+        <p id="win-lili-quote" class="win-lili-quote">"Díky, že jsi mě zachránil a byl tak úžasný dobrodruh! Jsi můj hrdina! 🌸"</p>
+        <div class="menu-buttons">
+          <button id="btn-play-again" class="btn btn-primary pulse">🌟 HRÁT ZNOVU</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Varování otočení displeje na mobilu -->
+    <div id="orientation-warning" class="orientation-warning">
+      <div class="orient-content">
+        <div class="phone-rotate-icon">📱 ↷</div>
+        <h3>Otočte zařízení na šířku</h3>
+        <p>Pro nejlepší herní zážitek hrajte prosím v režimu na šířku (Landscape).</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
