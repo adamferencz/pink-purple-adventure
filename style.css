@@ -15,7 +15,7 @@
   --purple-glow: rgba(157, 78, 221, 0.6);
   --gold: #facc15;
   --green: #4ade80;
-  --card-bg: rgba(29, 13, 49, 0.88);
+  --card-bg: rgba(29, 13, 49, 0.92);
   --card-border: rgba(255, 117, 195, 0.45);
 }
 
@@ -31,7 +31,13 @@
 html, body {
   width: 100%;
   height: 100%;
+  height: 100dvh;
+  margin: 0;
+  padding: 0;
   overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
   background-color: var(--bg-deep-purple);
   font-family: 'Fredoka', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   color: #fff;
@@ -39,9 +45,14 @@ html, body {
 }
 
 #game-container {
-  position: relative;
-  width: 100vw;
-  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -49,18 +60,18 @@ html, body {
   background: radial-gradient(circle at center, #2e0854 0%, #110521 100%);
 }
 
-/* Canvas styling */
+/* Canvas styling - responzivní přizpůsobení obrazovce bez přetékání */
 #gameCanvas {
   display: block;
   width: 100%;
   height: 100%;
-  max-width: 100vw;
-  max-height: 100vh;
+  max-width: 100%;
+  max-height: 100%;
   object-fit: contain;
   background: #190933;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
-  box-shadow: 0 0 40px rgba(121, 40, 202, 0.4);
+  box-shadow: 0 0 35px rgba(121, 40, 202, 0.35);
 }
 
 /* =========================================================
@@ -68,14 +79,14 @@ html, body {
    ========================================================= */
 .overlay-ui {
   position: absolute;
-  top: 14px;
-  left: 20px;
-  right: 20px;
+  top: max(8px, env(safe-area-inset-top));
+  left: max(10px, env(safe-area-inset-left));
+  right: max(10px, env(safe-area-inset-right));
   display: flex;
   justify-content: space-between;
   align-items: center;
   pointer-events: none;
-  z-index: 20;
+  z-index: 50;
 }
 
 .overlay-ui button {
@@ -85,26 +96,27 @@ html, body {
 .hud-left, .hud-right, .hud-center {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 
 .hud-item {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   background: rgba(35, 12, 60, 0.85);
   backdrop-filter: blur(8px);
-  padding: 8px 16px;
+  -webkit-backdrop-filter: blur(8px);
+  padding: 6px 14px;
   border-radius: 30px;
-  border: 2px solid var(--card-border);
+  border: 1.5px solid var(--card-border);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4), 0 0 10px rgba(255, 42, 133, 0.25);
   font-weight: 700;
-  font-size: 1.15rem;
+  font-size: 1.05rem;
   letter-spacing: 0.5px;
 }
 
 .hud-icon {
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   filter: drop-shadow(0 0 4px rgba(255,255,255,0.4));
 }
 
@@ -115,39 +127,39 @@ html, body {
 
 .hud-badge {
   background: linear-gradient(135deg, #a91079, #570a57);
-  padding: 8px 20px;
+  padding: 6px 14px;
   border-radius: 20px;
   border: 2px solid #ff75c3;
   font-weight: 700;
-  letter-spacing: 1.5px;
+  letter-spacing: 1.2px;
   box-shadow: 0 0 15px var(--neon-glow);
   font-family: 'Press Start 2P', monospace;
-  font-size: 0.8rem;
+  font-size: 0.72rem;
   color: #ffd6ff;
 }
 
 .hud-powerup {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   background: rgba(20, 6, 35, 0.95);
-  padding: 6px 14px;
+  padding: 5px 12px;
   border-radius: 20px;
   border: 2px solid #4ade80;
   animation: glowPulse 1.5s infinite alternate;
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
 .hud-powerup.hidden {
-  display: none;
+  display: none !important;
 }
 
 .powerup-timer-bar {
-  width: 70px;
-  height: 10px;
+  width: 55px;
+  height: 8px;
   background: rgba(255,255,255,0.2);
-  border-radius: 5px;
+  border-radius: 4px;
   overflow: hidden;
 }
 
@@ -162,9 +174,9 @@ html, body {
   background: rgba(46, 14, 75, 0.85);
   border: 2px solid #ff75c3;
   color: #fff;
-  font-size: 1.3rem;
-  width: 44px;
-  height: 44px;
+  font-size: 1.15rem;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   cursor: pointer;
   display: flex;
@@ -175,42 +187,43 @@ html, body {
 }
 
 .hud-btn:hover {
-  transform: scale(1.1);
+  transform: scale(1.08);
   background: var(--primary-pink);
   box-shadow: 0 0 16px var(--neon-glow);
 }
 
-/* Interakční prompt (bublina nad hlavou / uprostřed dole) */
+/* Interakční prompt */
 .interact-prompt {
   position: absolute;
-  bottom: 80px;
+  bottom: 74px;
   left: 50%;
   transform: translateX(-50%);
-  background: linear-gradient(135deg, rgba(255, 42, 133, 0.92), rgba(121, 40, 202, 0.92));
+  background: linear-gradient(135deg, rgba(255, 42, 133, 0.95), rgba(121, 40, 202, 0.95));
   color: white;
-  padding: 10px 22px;
+  padding: 8px 18px;
   border-radius: 25px;
   border: 2px solid #fff;
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 1rem;
   box-shadow: 0 0 20px rgba(255, 42, 133, 0.8);
   pointer-events: none;
-  z-index: 25;
+  z-index: 55;
   animation: bouncePrompt 0.8s infinite alternate ease-in-out;
+  white-space: nowrap;
 }
 
 .interact-prompt.hidden {
-  display: none;
+  display: none !important;
 }
 
 .key-badge {
   display: inline-block;
   background: #fff;
   color: #570a57;
-  padding: 2px 8px;
+  padding: 2px 7px;
   border-radius: 6px;
   font-weight: 800;
-  margin-right: 6px;
+  margin-right: 4px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
@@ -223,13 +236,15 @@ html, body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(10, 4, 18, 0.75);
+  background: rgba(10, 4, 18, 0.8);
   backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 50;
+  z-index: 70;
   transition: opacity 0.25s ease;
+  padding: 10px;
 }
 
 .screen-modal.hidden {
@@ -240,10 +255,12 @@ html, body {
   background: var(--card-bg);
   border: 3px solid var(--card-border);
   box-shadow: 0 0 45px rgba(255, 42, 133, 0.4), inset 0 0 30px rgba(121, 40, 202, 0.3);
-  border-radius: 24px;
-  padding: 30px 40px;
-  max-width: 620px;
-  width: 90%;
+  border-radius: 22px;
+  padding: 24px 30px;
+  max-width: 600px;
+  width: 92%;
+  max-height: 94dvh;
+  overflow-y: auto;
   text-align: center;
   color: #fff;
   animation: popIn 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
@@ -253,15 +270,15 @@ html, body {
   max-width: 440px;
 }
 
-/* Logo styling */
+/* Logo */
 .game-logo {
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   position: relative;
 }
 
 .logo-text {
   font-family: 'Press Start 2P', monospace;
-  font-size: 2rem;
+  font-size: 1.8rem;
   background: linear-gradient(180deg, #ffffff 0%, #ff75c3 50%, #ff007f 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -270,28 +287,28 @@ html, body {
 }
 
 .logo-subtext {
-  font-size: 1.4rem;
+  font-size: 1.25rem;
   color: #e0aaff;
   letter-spacing: 2px;
-  margin-top: 6px;
+  margin-top: 4px;
   text-shadow: 0 0 10px rgba(157, 78, 221, 0.8);
 }
 
 .menu-desc {
-  font-size: 1.05rem;
+  font-size: 1rem;
   color: #f1c0e8;
-  line-height: 1.5;
-  margin-bottom: 20px;
+  line-height: 1.45;
+  margin-bottom: 16px;
 }
 
 .menu-high-score {
   background: rgba(46, 14, 75, 0.6);
   border: 1px dashed #ff75c3;
-  padding: 10px 18px;
+  padding: 8px 16px;
   border-radius: 12px;
   display: inline-block;
-  margin-bottom: 22px;
-  font-size: 1.1rem;
+  margin-bottom: 18px;
+  font-size: 1rem;
 }
 
 .menu-high-score strong {
@@ -302,17 +319,17 @@ html, body {
 .menu-buttons {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 /* Tlačítka */
 .btn {
   font-family: 'Fredoka', sans-serif;
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   font-weight: 700;
-  padding: 14px 34px;
+  padding: 12px 28px;
   border-radius: 30px;
   cursor: pointer;
   border: none;
@@ -330,7 +347,7 @@ html, body {
 }
 
 .btn-primary:hover {
-  transform: translateY(-3px) scale(1.03);
+  transform: translateY(-2px) scale(1.02);
   box-shadow: 0 8px 25px rgba(255, 42, 133, 0.85);
   background: linear-gradient(135deg, #ff4d9d, #c720ad);
 }
@@ -363,91 +380,91 @@ html, body {
 }
 
 .controls-hint {
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   color: #c8b6ff;
   display: flex;
   flex-direction: column;
   gap: 4px;
-  line-height: 1.4;
+  line-height: 1.35;
   border-top: 1px solid rgba(255, 117, 195, 0.2);
-  padding-top: 14px;
+  padding-top: 12px;
 }
 
 /* =========================================================
    NÁVOD K POUŽITÍ (INSTRUCTIONS)
    ========================================================= */
 .instructions-card {
-  max-width: 660px;
+  max-width: 640px;
   text-align: left;
 }
 
 .instructions-card h3 {
-  font-size: 1.6rem;
+  font-size: 1.45rem;
   color: #ff75c3;
-  margin-bottom: 18px;
+  margin-bottom: 14px;
   text-align: center;
 }
 
 .instructions-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-bottom: 22px;
+  gap: 12px;
+  margin-bottom: 18px;
 }
 
 .inst-item {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
+  gap: 10px;
   background: rgba(40, 15, 65, 0.6);
-  padding: 12px 14px;
-  border-radius: 14px;
+  padding: 10px 12px;
+  border-radius: 12px;
   border: 1px solid rgba(255, 117, 195, 0.25);
 }
 
 .inst-icon {
-  font-size: 1.8rem;
+  font-size: 1.6rem;
 }
 
 .inst-item strong {
   display: block;
-  font-size: 1.05rem;
+  font-size: 0.98rem;
   color: #fff;
-  margin-bottom: 4px;
+  margin-bottom: 3px;
 }
 
 .inst-item p {
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   color: #e0aaff;
-  line-height: 1.35;
+  line-height: 1.3;
 }
 
 /* =========================================================
    DIALOGOVÉ OKNO - AI PŘÍTELKYNĚ LILI
    ========================================================= */
 .dialog-card {
-  max-width: 580px;
+  max-width: 560px;
   text-align: left;
   border-color: #ff4b91;
   box-shadow: 0 0 50px rgba(255, 75, 145, 0.5);
-  padding: 24px 30px;
+  padding: 20px 24px;
 }
 
 .dialog-header {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
   position: relative;
-  padding-bottom: 16px;
+  padding-bottom: 12px;
   border-bottom: 2px solid rgba(255, 117, 195, 0.25);
 }
 
 .npc-avatar-box {
-  width: 70px;
-  height: 70px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   background: #391259;
-  border: 3px solid #ff75c3;
+  border: 2px solid #ff75c3;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -461,7 +478,7 @@ html, body {
 }
 
 .npc-name {
-  font-size: 1.4rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: #ff9ebb;
   display: flex;
@@ -470,31 +487,31 @@ html, body {
 }
 
 .npc-tag {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 400;
   background: rgba(157, 78, 221, 0.4);
-  padding: 2px 8px;
+  padding: 2px 7px;
   border-radius: 10px;
   color: #e0aaff;
 }
 
 .affection-wrap {
-  margin-top: 6px;
+  margin-top: 4px;
 }
 
 .affection-label {
   display: flex;
   justify-content: space-between;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   color: #ffcbf2;
-  margin-bottom: 4px;
+  margin-bottom: 3px;
 }
 
 .affection-bar {
   width: 100%;
-  height: 12px;
+  height: 10px;
   background: rgba(255,255,255,0.15);
-  border-radius: 6px;
+  border-radius: 5px;
   overflow: hidden;
   border: 1px solid rgba(255, 117, 195, 0.3);
 }
@@ -508,25 +525,26 @@ html, body {
 
 .dialog-close-x {
   position: absolute;
-  top: -5px;
-  right: -5px;
+  top: -4px;
+  right: -4px;
   background: none;
   border: none;
   color: #ff75c3;
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   cursor: pointer;
+  padding: 4px;
 }
 
 .dialog-speech-bubble {
   background: rgba(50, 18, 80, 0.85);
   border: 2px solid #b5179e;
-  border-radius: 16px;
-  padding: 16px 20px;
-  margin: 18px 0;
-  font-size: 1.1rem;
-  line-height: 1.5;
+  border-radius: 14px;
+  padding: 12px 16px;
+  margin: 14px 0;
+  font-size: 1rem;
+  line-height: 1.45;
   color: #fff;
-  min-height: 85px;
+  min-height: 65px;
   box-shadow: inset 0 2px 8px rgba(0,0,0,0.4);
   position: relative;
 }
@@ -535,7 +553,7 @@ html, body {
   content: '';
   position: absolute;
   top: -10px;
-  left: 28px;
+  left: 24px;
   border-left: 10px solid transparent;
   border-right: 10px solid transparent;
   border-bottom: 10px solid #b5179e;
@@ -544,17 +562,17 @@ html, body {
 .dialog-actions {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-bottom: 16px;
+  gap: 8px;
+  margin-bottom: 14px;
 }
 
 .dialog-action-btn {
   background: linear-gradient(135deg, #7209b7, #560bad);
   color: #fff;
   border: 2px solid #b5179e;
-  padding: 10px 16px;
+  padding: 8px 14px;
   border-radius: 12px;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
@@ -564,29 +582,28 @@ html, body {
 .dialog-action-btn:hover {
   background: linear-gradient(135deg, #8318cb, #6610cf);
   box-shadow: 0 0 12px rgba(181, 23, 158, 0.6);
-  transform: translateY(-1px);
 }
 
 .gifts-label {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 600;
   color: #ffb3c6;
-  margin-top: 6px;
+  margin-top: 4px;
 }
 
 .gift-buttons {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  gap: 8px;
+  gap: 6px;
 }
 
 .btn-gift {
   background: rgba(30, 10, 50, 0.8);
   border: 2px solid #ff75c3;
   color: #fff;
-  padding: 10px 8px;
-  border-radius: 12px;
-  font-size: 0.9rem;
+  padding: 8px 6px;
+  border-radius: 10px;
+  font-size: 0.82rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
@@ -599,7 +616,6 @@ html, body {
 .btn-gift:hover:not(:disabled) {
   background: #ff2a85;
   box-shadow: 0 0 12px var(--neon-glow);
-  transform: translateY(-2px);
 }
 
 .btn-gift:disabled {
@@ -609,7 +625,7 @@ html, body {
 }
 
 .gift-bonus {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   color: #ffb3c6;
 }
 
@@ -618,11 +634,11 @@ html, body {
   justify-content: space-between;
   align-items: center;
   border-top: 1px solid rgba(255, 117, 195, 0.2);
-  padding-top: 14px;
+  padding-top: 12px;
 }
 
 .user-coins-display {
-  font-size: 1.05rem;
+  font-size: 0.95rem;
   color: #ffd6ff;
 }
 
@@ -640,53 +656,53 @@ html, body {
 
 .gameover-title {
   color: #ff4d6d;
-  font-size: 2rem;
-  margin-bottom: 10px;
+  font-size: 1.8rem;
+  margin-bottom: 8px;
 }
 
 .stats-summary {
   background: rgba(0,0,0,0.3);
-  padding: 14px;
+  padding: 12px;
   border-radius: 12px;
-  margin: 16px 0;
-  font-size: 1.1rem;
+  margin: 14px 0;
+  font-size: 1rem;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .win-banner {
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   font-weight: 700;
   color: #ff75c3;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   text-shadow: 0 0 15px rgba(255, 117, 195, 0.8);
 }
 
 .win-stats-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin: 20px 0;
+  gap: 10px;
+  margin: 16px 0;
 }
 
 .win-stat-box {
   background: rgba(50, 18, 80, 0.7);
   border: 1px solid #b5179e;
-  border-radius: 14px;
-  padding: 12px;
+  border-radius: 12px;
+  padding: 10px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
 }
 
 .ws-label {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: #e0aaff;
 }
 
 .ws-val {
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   font-weight: 700;
   color: #fff;
 }
@@ -696,84 +712,88 @@ html, body {
   color: #ffcbf2;
   background: rgba(255, 42, 133, 0.15);
   border-left: 4px solid #ff4b91;
-  padding: 10px 14px;
+  padding: 8px 12px;
   border-radius: 6px;
-  margin-bottom: 20px;
-  line-height: 1.4;
+  margin-bottom: 16px;
+  line-height: 1.35;
+  font-size: 0.95rem;
 }
 
 /* =========================================================
    DOTYKOVÉ OVLÁDÁNÍ PRO MOBILNÍ TELEFONY
+   Pevně ukotvené, nezmizí na šířku, přizpůsobuje se bezpečné zóně
    ========================================================= */
 .touch-controls {
   position: absolute;
-  bottom: 14px;
-  left: 14px;
-  right: 14px;
+  bottom: max(6px, env(safe-area-inset-bottom));
+  left: max(8px, env(safe-area-inset-left));
+  right: max(8px, env(safe-area-inset-right));
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
   pointer-events: none;
-  z-index: 25;
+  z-index: 60;
 }
 
 .touch-left, .touch-right {
   display: flex;
-  gap: 12px;
+  gap: 8px;
   pointer-events: auto;
 }
 
 .touch-btn {
-  background: rgba(35, 12, 60, 0.65);
-  border: 2px solid rgba(255, 117, 195, 0.6);
+  background: rgba(35, 12, 60, 0.75);
+  border: 2px solid rgba(255, 117, 195, 0.85);
   color: #ffffff;
-  font-size: 1.5rem;
-  width: 66px;
-  height: 66px;
+  font-size: 1.25rem;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4), inset 0 0 10px rgba(255, 42, 133, 0.3);
-  backdrop-filter: blur(5px);
-  touch-action: manipulation;
-  transition: transform 0.08s, background-color 0.08s;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(255, 42, 133, 0.4);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  touch-action: none;
+  transition: transform 0.06s, background-color 0.06s;
+  user-select: none;
 }
 
 .touch-btn:active {
   transform: scale(0.92);
-  background: rgba(255, 42, 133, 0.7);
+  background: rgba(255, 42, 133, 0.85);
   box-shadow: 0 0 18px var(--neon-glow);
 }
 
 .touch-jump-btn {
-  width: 78px;
-  height: 78px;
-  background: rgba(181, 23, 158, 0.65);
-  font-size: 1.05rem;
+  width: 62px;
+  height: 62px;
+  background: rgba(181, 23, 158, 0.8);
+  font-size: 0.9rem;
   font-weight: 700;
   border-color: #ff75c3;
 }
 
 .touch-action-btn {
-  width: 62px;
-  height: 62px;
-  font-size: 1rem;
+  width: 48px;
+  height: 48px;
+  font-size: 0.82rem;
   font-weight: 700;
   align-self: center;
-  background: rgba(114, 9, 183, 0.65);
+  background: rgba(114, 9, 183, 0.8);
 }
 
-/* Skrýt dotykové prvky na čistě desktopových zařízeních bez dotyku */
-@media (hover: hover) and (pointer: fine) and (min-width: 900px) {
-  .touch-controls {
-    display: none;
+/* Skrýt dotykové ovládání POUZE na velkých stolních monitorech bez dotyku */
+@media (hover: hover) and (pointer: fine) and (min-width: 1024px) and (min-height: 650px) {
+  body:not(.has-touch) .touch-controls {
+    display: none !important;
   }
 }
 
 /* =========================================================
-   VAROVÁNÍ PŘI ORIENTACI NA VÝŠKU (PORTRAIT)
+   VAROVÁNÍ PŘI ORIENTACI NA VÝŠKU (INFORMATIVNÍ, NEBLOKUJÍCÍ)
    ========================================================= */
 .orientation-warning {
   display: none;
@@ -782,65 +802,197 @@ html, body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(15, 5, 25, 0.98);
-  z-index: 100;
+  background: rgba(15, 5, 25, 0.92);
+  z-index: 99999;
   justify-content: center;
   align-items: center;
   text-align: center;
-  padding: 24px;
+  padding: 20px;
 }
 
+/* Zobrazit pouze pokud je zařízení na výšku a uživatel varování nezavřel */
 @media screen and (orientation: portrait) and (max-width: 768px) {
-  .orientation-warning {
+  body:not(.orient-dismissed) .orientation-warning {
     display: flex;
   }
 }
 
 .orient-content {
-  background: rgba(45, 14, 75, 0.8);
+  background: rgba(45, 14, 75, 0.9);
   border: 2px solid #ff75c3;
   border-radius: 20px;
-  padding: 30px;
+  padding: 26px 20px;
+  max-width: 380px;
   box-shadow: 0 0 30px rgba(255, 42, 133, 0.4);
 }
 
 .phone-rotate-icon {
-  font-size: 3.5rem;
-  margin-bottom: 14px;
+  font-size: 3rem;
+  margin-bottom: 12px;
   animation: rotatePhone 2.5s infinite ease-in-out;
 }
 
 .orient-content h3 {
-  font-size: 1.4rem;
+  font-size: 1.25rem;
   color: #ff9ebb;
   margin-bottom: 8px;
 }
 
 .orient-content p {
   color: #e0aaff;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+/* =========================================================
+   PŘIZPŮSOBENÍ PRO ŠÍŘKOVÝ REŽIM MOBILU (BEZ FULLSCREENU)
+   Pokud má okno malou výšku (max-height: 520px)
+   ========================================================= */
+@media (max-height: 520px) {
+  .overlay-ui {
+    top: max(4px, env(safe-area-inset-top));
+    left: max(6px, env(safe-area-inset-left));
+    right: max(6px, env(safe-area-inset-right));
+  }
+  .hud-item {
+    padding: 3px 8px;
+    font-size: 0.82rem;
+    gap: 3px;
+    border-radius: 16px;
+  }
+  .hud-icon {
+    font-size: 0.9rem;
+  }
+  .hud-badge {
+    padding: 3px 8px;
+    font-size: 0.58rem;
+  }
+  .hud-btn {
+    width: 30px;
+    height: 30px;
+    font-size: 0.9rem;
+  }
+  .hud-powerup {
+    padding: 2px 7px;
+    font-size: 0.72rem;
+  }
+  .powerup-timer-bar {
+    width: 40px;
+    height: 6px;
+  }
+  .touch-controls {
+    bottom: max(3px, env(safe-area-inset-bottom));
+    left: max(5px, env(safe-area-inset-left));
+    right: max(5px, env(safe-area-inset-right));
+  }
+  .touch-btn {
+    width: 44px;
+    height: 44px;
+    font-size: 1.15rem;
+  }
+  .touch-jump-btn {
+    width: 52px;
+    height: 52px;
+    font-size: 0.78rem;
+  }
+  .touch-action-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 0.72rem;
+  }
+  .interact-prompt {
+    bottom: 54px;
+    font-size: 0.85rem;
+    padding: 5px 12px;
+  }
+  .modal-card {
+    padding: 12px 16px;
+    max-height: 96dvh;
+    border-radius: 16px;
+  }
+  .logo-text {
+    font-size: 1.25rem;
+  }
+  .logo-subtext {
+    font-size: 0.95rem;
+    margin-top: 2px;
+  }
+  .menu-desc {
+    display: none;
+  }
+  .menu-high-score {
+    margin-bottom: 8px;
+    padding: 4px 10px;
+    font-size: 0.82rem;
+  }
+  .menu-buttons {
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  .btn {
+    padding: 7px 18px;
+    font-size: 0.92rem;
+  }
+  .controls-hint {
+    display: none;
+  }
+  .dialog-card {
+    padding: 10px 14px;
+  }
+  .npc-avatar-box {
+    width: 46px;
+    height: 46px;
+  }
+  .dialog-speech-bubble {
+    margin: 8px 0;
+    padding: 8px 12px;
+    font-size: 0.88rem;
+    min-height: 48px;
+  }
+  .dialog-actions {
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  .btn-gift {
+    padding: 5px 4px;
+    font-size: 0.74rem;
+  }
+  .instructions-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .inst-item {
+    padding: 6px 8px;
+  }
+  .inst-item strong {
+    font-size: 0.85rem;
+  }
+  .inst-item p {
+    font-size: 0.75rem;
+  }
 }
 
 /* =========================================================
    ANIMACE
    ========================================================= */
 @keyframes glowPulse {
-  0% { box-shadow: 0 0 8px rgba(74, 222, 128, 0.4); }
-  100% { box-shadow: 0 0 20px rgba(74, 222, 128, 0.9); }
+  0% { box-shadow: 0 0 6px rgba(74, 222, 128, 0.4); }
+  100% { box-shadow: 0 0 16px rgba(74, 222, 128, 0.9); }
 }
 
 @keyframes pulseBtn {
   0%, 100% { transform: scale(1); box-shadow: 0 6px 20px rgba(255, 42, 133, 0.6); }
-  50% { transform: scale(1.04); box-shadow: 0 8px 30px rgba(255, 42, 133, 0.95); }
+  50% { transform: scale(1.03); box-shadow: 0 8px 28px rgba(255, 42, 133, 0.95); }
 }
 
 @keyframes bouncePrompt {
   0% { transform: translate(-50%, 0); }
-  100% { transform: translate(-50%, -8px); }
+  100% { transform: translate(-50%, -6px); }
 }
 
 @keyframes popIn {
-  0% { transform: scale(0.85); opacity: 0; }
+  0% { transform: scale(0.88); opacity: 0; }
   100% { transform: scale(1); opacity: 1; }
 }
 
@@ -848,40 +1000,4 @@ html, body {
   0%, 20% { transform: rotate(0deg); }
   50%, 70% { transform: rotate(90deg); }
   100% { transform: rotate(0deg); }
-}
-
-/* Responzivita pro menší obrazovky */
-@media (max-width: 600px) {
-  .overlay-ui {
-    top: 8px;
-    left: 8px;
-    right: 8px;
-  }
-  .hud-item {
-    padding: 5px 10px;
-    font-size: 0.9rem;
-    gap: 4px;
-  }
-  .hud-badge {
-    padding: 6px 12px;
-    font-size: 0.65rem;
-  }
-  .modal-card {
-    padding: 20px;
-  }
-  .logo-text {
-    font-size: 1.35rem;
-  }
-  .logo-subtext {
-    font-size: 1.1rem;
-  }
-  .instructions-grid {
-    grid-template-columns: 1fr;
-  }
-  .gift-buttons {
-    grid-template-columns: 1fr;
-  }
-  .dialog-card {
-    padding: 16px;
-  }
 }

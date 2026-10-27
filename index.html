@@ -2,7 +2,7 @@
 <html lang="cs">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Pink & Purple Adventure 🌸💜</title>
   <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -44,6 +44,7 @@
       </div>
 
       <div class="hud-right">
+        <button id="btn-fullscreen" class="hud-btn" title="Celá obrazovka (volitelně)">⛶</button>
         <button id="btn-audio" class="hud-btn" title="Zvuk zapnout/vypnout">🔊</button>
         <button id="btn-pause" class="hud-btn" title="Pauza (Esc)">⏸️</button>
       </div>
@@ -240,12 +241,13 @@
       </div>
     </div>
 
-    <!-- Varování otočení displeje na mobilu -->
+    <!-- Varování otočení displeje na mobilu (informativní a snadno zavíratelné) -->
     <div id="orientation-warning" class="orientation-warning">
       <div class="orient-content">
         <div class="phone-rotate-icon">📱 ↷</div>
-        <h3>Otočte zařízení na šířku</h3>
-        <p>Pro nejlepší herní zážitek hrajte prosím v režimu na šířku (Landscape).</p>
+        <h3>Doporučení: Hrajte na šířku</h3>
+        <p>Pro nejlepší přehled je doporučeno otočit telefon na šířku. Můžete však hrát i na výšku!</p>
+        <button id="btn-dismiss-orient" class="btn btn-primary" style="margin-top:16px;">▶ Pokračovat ve hře</button>
       </div>
     </div>
   </div>

@@ -664,6 +664,35 @@
 
       document.getElementById('btn-play-again').addEventListener('click', () => this.startNewGame());
 
+      // Detekce dotykového zařízení
+      const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+      if (isTouchDevice) {
+        document.body.classList.add('has-touch');
+      }
+
+      // Tlačítko celé obrazovky (volitelné)
+      const btnFullscreen = document.getElementById('btn-fullscreen');
+      if (btnFullscreen) {
+        btnFullscreen.addEventListener('click', () => {
+          if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+            const docEl = document.documentElement;
+            if (docEl.requestFullscreen) docEl.requestFullscreen();
+            else if (docEl.webkitRequestFullscreen) docEl.webkitRequestFullscreen();
+          } else {
+            if (document.exitFullscreen) document.exitFullscreen();
+            else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+          }
+        });
+      }
+
+      // Tlačítko zavření varování na výšku
+      const btnDismissOrient = document.getElementById('btn-dismiss-orient');
+      if (btnDismissOrient) {
+        btnDismissOrient.addEventListener('click', () => {
+          document.body.classList.add('orient-dismissed');
+        });
+      }
+
       // Dialog Lili
       document.getElementById('btn-dialog-close').addEventListener('click', () => this.closeDialog());
       document.getElementById('btn-dialog-close-x').addEventListener('click', () => this.closeDialog());
